@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String url ="https://www.reddit.com/r/earthporn/hot.json";
+        String url ="https://www.reddit.com/r/AsianGuysNSFW/hot.json";
         JsonTask jsonTask = new JsonTask();
         jsonTask.execute(url);
     }
@@ -75,11 +75,16 @@ public class MainActivity extends AppCompatActivity {
 
                         for(int i=0;i<=children.length();i++){
                             JSONObject child = children.getJSONObject(i).getJSONObject("data");
+                            //Log.d("Response:",child.toString());
                             String subreddit = child.getString("subreddit");
-                            String title = child.getString("title");
-                            String thumbnail = child.getString("thumbnail");
-                            String itemurl = child.getString("url_overridden_by_dest");
-                            Log.d("Response:",subreddit+"\n"+title+"\n"+itemurl);
+                            Log.d("Response:",subreddit);
+                            String title = child.optString("title");
+                            Log.d("Response:",title);
+                            String thumbnail = child.optString("thumbnail");
+                            Log.d("Response:",thumbnail);
+                            String itemurl = child.optString("url_overridden_by_dest");
+                            Log.d("Response:",itemurl);
+                            //Log.d("Response:",subreddit+"\n"+title+"\n"+itemurl);
 
                         }
                     }
@@ -94,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } catch (JSONException jsonException) {
                     jsonException.printStackTrace();
+                    Log.e("error",jsonException.getMessage());
                 } finally {
                     if (connection != null) {
                         connection.disconnect();
