@@ -42,18 +42,20 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Items itemlist = items.get(position);
-        holder.textView.setText(itemlist.getTitle());
-        Picasso.with(context)
-                .load(itemlist.getItemUrl())
+        if(itemlist.getItemUrl()!="") {
+            holder.textView.setText(itemlist.getTitle());
+            Picasso.with(context)
+                    .load(itemlist.getItemUrl())
 //                .resize(1300, 1500)
 //                .onlyScaleDown()
-                .into(holder.imageView);
+                    .into(holder.imageView);
+        }
 
-        holder.imageView.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(itemlist.getItemUrl()));
-            context.startActivity(intent);
-        });
+//        holder.imageView.setOnClickListener(v -> {
+//            Intent intent = new Intent(Intent.ACTION_VIEW);
+//            intent.setData(Uri.parse(itemlist.getItemUrl()));
+//            context.startActivity(intent);
+//        });
         //holder.favView.setImageResource(R.drawable.ic_fav_empty);
     }
 
@@ -73,21 +75,21 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
             textView = itemView.findViewById(R.id.titleTextView);
             //favView = itemView.findViewById(R.id.favView);
 
-            favView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //favView.setImageResource(R.drawable.ic_fav);
-//                    if(recyclerClickInterface !=null){
-//                        int pos = getAdapterPosition();
-//                        recyclerClickInterface.onItemClick(pos);
-//
-////                        if(pos != RecyclerView.NO_POSITION){
-////                            recyclerClickInterface.onItemClick(pos);
-////                        }
-//
-//                    }
-                }
-            });
+//            favView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    //favView.setImageResource(R.drawable.ic_fav);
+////                    if(recyclerClickInterface !=null){
+////                        int pos = getAdapterPosition();
+////                        recyclerClickInterface.onItemClick(pos);
+////
+//////                        if(pos != RecyclerView.NO_POSITION){
+//////                            recyclerClickInterface.onItemClick(pos);
+//////                        }
+////
+////                    }
+//                }
+//            });
         }
     }
 }

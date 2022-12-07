@@ -1,5 +1,6 @@
 package com.example.parsejson;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,9 +28,16 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ArrayList<Items> items = new ArrayList<>();
-    private ProgressBar progressBar;
-    private TextView textView;
+
+
     private GalleryAdapter adapter;
+    private boolean loading = true;
+    int firstVisibleItem, visibleItemCount, totalItemCount;
+    private int previousTotal = 0;
+    private int visibleThreshold = 5;
+    String after;
+
+
 
 
     @Override
@@ -37,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyclerView);
-        progressBar = findViewById(R.id.progressBar);
+
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager); // set LayoutManager to RecyclerView
@@ -45,20 +53,51 @@ public class MainActivity extends AppCompatActivity {
         adapter = new GalleryAdapter(this, items);
         recyclerView.setAdapter(adapter);
 
-        String url = "https://www.reddit.com/r/AsianGuysNSFW/hot.json";
+        //String url = "https://www.reddit.com/r/AsianGuysNSFW/hot.json";
         JsonTask jsonTask = new JsonTask();
-        jsonTask.execute(url);
+        jsonTask.execute();
+
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                //super.onScrolled(recyclerView, dx, dy);
+                int lastVisibleItemPosition = 0;
+                visibleItemCount = linearLayoutManager.getChildCount();
+                totalItemCount = linearLayoutManager.getItemCount();
+                firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+                lastVisibleItemPosition = (linearLayoutManager).findLastVisibleItemPosition();
+
+                if (loading) {
+                    if (totalItemCount > previousTotal) {
+                        loading = false;
+                        previousTotal = totalItemCount;
+                    }
+                }
+
+                //if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+                if(!loading && (lastVisibleItemPosition + visibleThreshold)>(totalItemCount)){
+                    Log.d("Response:", "Load More "+after);
+                    JsonTask jsonTask = new JsonTask();
+                    jsonTask.execute();
+                    loading = true;
+                }
+            }
+
+        });
     }
 
 
-    private class JsonTask extends AsyncTask<String, String, String> {
+    private class JsonTask extends AsyncTask<Void, Void, Void> {
+        String url1 = "https://www.reddit.com/r/AsianGuysNSFW/hot.json?after="+after;
 
         protected void onPreExecute() {
             super.onPreExecute();
 
         }
 
-        protected String doInBackground(String... params) {
+        protected Void doInBackground(Void... voids) {
 
 
             HttpURLConnection connection = null;
@@ -67,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
             try {
 
-                URL url = new URL(params[0]);
+                URL url = new URL(url1);
                 Log.d("Response:", url.toString());
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
@@ -87,20 +126,22 @@ public class MainActivity extends AppCompatActivity {
                 if (!data.isEmpty()) {
                     JSONObject jsonObject = new JSONObject(data);
                     JSONObject feed = jsonObject.getJSONObject("data");
+                    after = feed.optString("after");
+                    Log.d("Response:", after);
                     JSONArray children = feed.getJSONArray("children");
-                    Log.d("Response:", String.valueOf(children.length()));
+                    //Log.d("Response:", String.valueOf(children.length()));
 
                     for (int i = 0; i <= children.length(); i++) {
                         JSONObject child = children.getJSONObject(i).getJSONObject("data");
                         //Log.d("Response:",child.toString());
                         String subreddit = child.optString("subreddit");
-                        Log.d("Response:", subreddit);
+                        //Log.d("Response:", subreddit);
                         String title = child.optString("title");
-                        Log.d("Response:", title);
+                        //Log.d("Response:", title);
                         String thumbnail = child.optString("thumbnail");
-                        Log.d("Response:", thumbnail);
+                        //Log.d("Response:", thumbnail);
                         String itemurl = child.optString("url_overridden_by_dest");
-                        Log.d("Response:", itemurl);
+                        //Log.d("Response:", itemurl);
                         //Log.d("Response:",subreddit+"\n"+title+"\n"+itemurl);
 
                         items.add(new Items(subreddit,title,thumbnail,itemurl));
@@ -135,8 +176,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            adapter.notifyDataSetChanged();
 
 
         }
