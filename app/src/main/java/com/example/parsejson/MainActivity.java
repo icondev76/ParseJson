@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private int previousTotal = 0;
     private int visibleThreshold = 5;
     String after;
+    String subreddits;
 
 
 
@@ -53,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
         adapter = new GalleryAdapter(this, items);
         recyclerView.setAdapter(adapter);
 
-        //String url = "https://www.reddit.com/r/AsianGuysNSFW/hot.json";
+        getsubreddits();
+
+       //String url = "https://www.reddit.com/r/AsianGuysNSFW/hot.json";
         JsonTask jsonTask = new JsonTask();
         jsonTask.execute();
 
@@ -90,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private class JsonTask extends AsyncTask<Void, Void, Void> {
-        String url1 = "https://www.reddit.com/r/AsianGuysNSFW/hot.json?after="+after;
+        String url1 = "https://www.reddit.com/r/"+subreddits+"/hot.json?after="+after;
 
         protected void onPreExecute() {
             super.onPreExecute();
@@ -183,4 +186,26 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+    private void getsubreddits() {
+
+        BufferedReader bufferedReader = null;
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(this.getAssets().open("subreddits.txt"), "UTF-8"));
+            subreddits = bufferedReader.readLine();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
 }
