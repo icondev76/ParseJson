@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -44,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getWindow().setFlags( // to hide the status bar
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyclerView);
 
@@ -134,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray children = feed.getJSONArray("children");
                     //Log.d("Response:", String.valueOf(children.length()));
 
-                    for (int i = 0; i <= children.length(); i++) {
+                    for (int i = 0; i < children.length(); i++) {
                         JSONObject child = children.getJSONObject(i).getJSONObject("data");
                         //Log.d("Response:",child.toString());
                         String subreddit = child.optString("subreddit");
@@ -147,7 +152,14 @@ public class MainActivity extends AppCompatActivity {
                         //Log.d("Response:", itemurl);
                         //Log.d("Response:",subreddit+"\n"+title+"\n"+itemurl);
 
-                        items.add(new Items(subreddit,title,thumbnail,itemurl));
+                        if(itemurl!="") {
+                            if(!itemurl.contains("redgifs") && !itemurl.contains("gif") && !itemurl.contains("gallery")){
+                                items.add(new Items(subreddit, title, thumbnail, itemurl));
+                                Log.d("Response:",subreddit+"\n"+title+"\n"+itemurl);
+                            }
+                        }
+
+
 
                     }
                 }

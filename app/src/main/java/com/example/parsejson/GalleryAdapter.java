@@ -43,19 +43,21 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Items itemlist = items.get(position);
         if(itemlist.getItemUrl()!="") {
-            holder.textView.setText(itemlist.getTitle());
+            holder.textView.setText(itemlist.getSubreddit());
             Picasso.with(context)
                     .load(itemlist.getItemUrl())
-//                .resize(1300, 1500)
+                .resize(1300, 0)
+//                    .fit()
+//                    .centerCrop()
 //                .onlyScaleDown()
                     .into(holder.imageView);
         }
 
-//        holder.imageView.setOnClickListener(v -> {
-//            Intent intent = new Intent(Intent.ACTION_VIEW);
-//            intent.setData(Uri.parse(itemlist.getItemUrl()));
-//            context.startActivity(intent);
-//        });
+        holder.imageView.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(itemlist.getItemUrl()));
+            context.startActivity(intent);
+        });
         //holder.favView.setImageResource(R.drawable.ic_fav_empty);
     }
 
@@ -72,8 +74,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById((R.id.imageView));
-            textView = itemView.findViewById(R.id.titleTextView);
-            //favView = itemView.findViewById(R.id.favView);
+            textView = itemView.findViewById(R.id.subredditTextView);
+            favView = itemView.findViewById(R.id.favView);
 
 //            favView.setOnClickListener(new View.OnClickListener() {
 //                @Override
